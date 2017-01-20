@@ -19,40 +19,39 @@ class Plant extends Model
 
     public static function botanicalName(Plant $plant)
     {
-        if (self::IsNullOrEmptyString($plant->genus_name)  && self::IsNullOrEmptyString($plant->specific_epithet))
+        if (INFX::IsNullOrEmptyString($plant->genus_name)  && INFX::IsNullOrEmptyString($plant->specific_epithet))
         {
             return "<<NO BOTANICAL NAME>>";
         }
 
-
         $plantname = "";
 
         //Genus Name
-        if (!self::IsNullOrEmptyString($plant->genus_name)) $plantname .= ucfirst(strtolower($plant->genus_name));
+        if (!INFX::IsNullOrEmptyString($plant->genus_name)) $plantname .= ucfirst(strtolower($plant->genus_name));
 
         // Specific Epithet
-        if (!self::IsNullOrEmptyString($plant->specific_epithet))
+        if (!INFX::IsNullOrEmptyString($plant->specific_epithet))
         {
             if($plantname != "") $plantname .= " ";
             $plantname .= strtolower($plant->specific_epithet);
         }
 
         // Hybrids
-        if (!self::IsNullOrEmptyString($plant->hybrid_genus))
+        if (!INFX::IsNullOrEmptyString($plant->hybrid_genus))
         {
             // Genus
             $plantname .= " x " . ucfirst(strtolower($plant->hybrid_genus));
 
             // Epithet
-            if (!self::IsNullOrEmptyString($plant->hybrid_epithet))
+            if (!INFX::IsNullOrEmptyString($plant->hybrid_epithet))
                 $plantname .= " " . strtolower($plant->hybrid_epithet);
         }
 
         // Variety
-        if (!self::IsNullOrEmptyString($plant->variety_name)) $plantname .= " var. " . strtolower($plant->variety_name);
+        if (!INFX::IsNullOrEmptyString($plant->variety_name)) $plantname .= " var. " . strtolower($plant->variety_name);
 
         // Cultivar
-        if (!self::IsNullOrEmptyString($plant->cultivar_name)) $plantname .= " '" . ucwords(strtolower($plant->cultivar_name)) . "'";
+        if (!INFX::IsNullOrEmptyString($plant->cultivar_name)) $plantname .= " '" . ucwords(strtolower($plant->cultivar_name)) . "'";
 
         // Trademark
         if ($plant->trademarked) $plantname .= " tm";
@@ -60,9 +59,26 @@ class Plant extends Model
         return $plantname;
     }
 
-    private static function IsNullOrEmptyString($test)
+    public static function leafDrop(Plant $plant)
     {
-        return (!isset($test) || trim($test)==='');
+        $bw = $plant->leaf_drop_bw;
+        $returnVal = null;
+
+        if (INFX::IsNullOrEmptyString($bw) || $bw == 0) return $returnVal;
+
+        if ($bw&1) $returnVal = "Evergreen";
+
+        if ($bw&2 && $returnVal == null)
+            $returnVal = "Semi-Deciduous";
+        elseif ($bw&2 && !($bw&4))
+            $returnVal .= " to Semi-Deciduous";
+
+        if ($bw&4 && $returnVal == null)
+            $returnVal = "Deciduous";
+        elseif ($bw&4)
+            $returnVal .= " to Deciduous";
+
+        return $returnVal;
     }
 
 }
