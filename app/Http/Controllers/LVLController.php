@@ -75,7 +75,12 @@ class LVLController extends Controller
      */
     public function show($id)
     {
-        $plantDetails = Plant::with('classifications')->where('plant_id', $id)->firstOrFail();
+        $plantDetails = Plant::with('classifications')
+                            ->with('flowerColors')
+                            ->with('specifications')
+                            ->with('plantImages')
+                            ->with('plantNotes')
+                            ->where('plant_id', $id)->firstOrFail();
 
         $plantDetails['bloom_months'] = Plant::bloomMonths($plantDetails);
 

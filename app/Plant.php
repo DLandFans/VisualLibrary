@@ -16,7 +16,7 @@ class Plant extends Model
     ];
 
     protected $hidden = [
-        'created_at', 'updated_at', 'pivot'
+//        'created_at', 'updated_at'
     ];
 
     protected $primaryKey = "plant_id";
@@ -25,6 +25,27 @@ class Plant extends Model
         return $this->belongsToMany('App\Classification', 'plant_classification', 'plant_id', 'class_id' )
             ->withTimestamps();
     }
+
+    public function flowerColors() {
+        return $this->belongsToMany('App\FlowerColor', 'plant_flower_color', 'plant_id', 'flower_color_id' )
+            ->withTimestamps();
+    }
+
+    public function specifications() {
+        return $this->belongsToMany('App\Specification', 'plant_specification', 'plant_id', 'specification_id' )
+            ->withPivot("specification_note")
+            ->withTimestamps();
+    }
+
+    public function plantImages() {
+        return $this->hasMany('App\PlantImage', 'plant_id');
+    }
+
+    public function plantNotes() {
+        return $this->hasMany('App\PlantNote', 'plant_id');
+    }
+
+    // Functions
 
     public static function botanicalName(Plant $plant)
     {
