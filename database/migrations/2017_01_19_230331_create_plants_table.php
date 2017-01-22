@@ -33,8 +33,8 @@ class CreatePlantsTable extends Migration
             $table->integer('bloom_months_bw')->default(0);
             $table->string('flower_color_desc', 75)->nullable();
             $table->integer('sun_exposure')->default(0);
-            $table->integer('hardiness_low')->default(-99);
-            $table->integer('hardiness_high')->default(-99);
+            $table->integer('hardiness_low')->default(-999);
+            $table->integer('hardiness_high')->default(-999);
             $table->timestamps();
         });
     }

@@ -75,29 +75,31 @@ class LVLController extends Controller
      */
     public function show($id)
     {
-        $plantDetails = Plant::where('plant_id', $id)->firstOrFail();
+        $plantDetails = Plant::with('classifications')->where('plant_id', $id)->firstOrFail();
+
+        $plantDetails['bloom_months'] = Plant::bloomMonths($plantDetails);
 
         $plant = [];
 
         $plant['id'] = $plantDetails->plant_id;
         $plant['botanical_name'] = Plant::botanicalName($plantDetails);
         $plant['common_name'] = $plantDetails->common_name;
-        $plant['leaf_drop'] = Plant::leafDrop($plantDetails);
-
-//        $plantDetails->botanical_name = Plant::botanicalName($plantDetails);
-
-//        $plantDetails->view_plants = [
-//            'href' => url('/api/v1/lvl'),
-//            'method' => 'GET'
-//        ];
+        $plant['type'] = Plant::leafDrop($plantDetails) . " " . Plant::plantClass($plantDetails->classifications);
+        $plant['height'] = Plant::height($plantDetails);
+        $plant['width'] = Plant::width($plantDetails);
+        $plant['zone'] = Plant::zone($plantDetails);
+        $plant['bloom_months_list'] = Plant::bloomMonthsList($plantDetails);
+        $plant['flower_color'] = $plantDetails->flower_color_desc;
+        $plant['sun_exposure'] = Plant::sunExposure($plantDetails);
+        $plant['hardiness'] = Plant::hardiness($plantDetails);
 
         $response = [
             'msg' => 'Plant Information',
             'plant' => $plant,
             'plant_details' => $plantDetails,
             'view_plants' => [
-            'href' => url('/api/v1/lvl'),
-            'method' => 'GET'
+                'href' => url('/api/v1/lvl'),
+                'method' => 'GET'
             ]
         ];
 
