@@ -25,5 +25,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(PlantImageTableSeeder::class);
         $this->call(PlantNoteTableSeeder::class);
+
+        $this->call(BotanicalNameTableSeeder::class);
+        $this->call(CommonNameTableSeeder::class);
     }
 }

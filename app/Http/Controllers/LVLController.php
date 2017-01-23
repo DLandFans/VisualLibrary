@@ -73,22 +73,28 @@ class LVLController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $plantDetails = Plant::with('classifications')
+        $plantDetails = Plant::with('botanicalNames')
+                            ->with('commonNames')
+                            ->with('classifications')
                             ->with('flowerColors')
                             ->with('specifications')
                             ->with('plantImages')
-                            ->with('plantNotes')
+                            ->with('plantNotes') // To Do
                             ->where('plant_id', $id)->firstOrFail();
 
         $plantDetails['bloom_months'] = Plant::bloomMonths($plantDetails);
+        $plantDetails['alt_botanical_names'] = Plant::altBotanicalNames($plantDetails->botanicalNames);
+        $plantDetails['alt_common_names'] = Plant::altCommonNames($plantDetails->commonNames);
 
         $plant = [];
 
         $plant['id'] = $plantDetails->plant_id;
         $plant['botanical_name'] = Plant::botanicalName($plantDetails);
+        $plant['altername_botanical_name_list'] = Plant::altBotanicalNamesList($plantDetails->botanicalNames);
         $plant['common_name'] = $plantDetails->common_name;
+        $plant['altername_common_name_list'] = Plant::altCommonNamesList($plantDetails->commonNames);
         $plant['type'] = Plant::leafDrop($plantDetails) . " " . Plant::plantClass($plantDetails->classifications);
         $plant['height'] = Plant::height($plantDetails);
         $plant['width'] = Plant::width($plantDetails);
@@ -97,16 +103,28 @@ class LVLController extends Controller
         $plant['flower_color'] = $plantDetails->flower_color_desc;
         $plant['sun_exposure'] = Plant::sunExposure($plantDetails);
         $plant['hardiness'] = Plant::hardiness($plantDetails);
+        $plant['specifications'] = Plant::specificationsList($plantDetails->specifications);
+        $plant['images'] = Plant::images($plantDetails->plantImages);
+        $plant['notes'] = Plant::notes($plantDetails->plantNotes);
+
 
         $response = [
             'msg' => 'Plant Information',
             'plant' => $plant,
-            'plant_details' => $plantDetails,
             'view_plants' => [
                 'href' => url('/api/v1/lvl'),
                 'method' => 'GET'
             ]
         ];
+
+        if ((strtolower($request->input('detail')) == "true") || (strtolower($request->input('detail')) == "1")) {
+            $response['plant_details'] = $plantDetails;
+        } else {
+            $response['view_plant_details'] = [
+                'href' => url('/api/v1/lvl') . "/" . $plantDetails->plant_id . "?detail=true",
+                'method' => 'GET'
+            ];
+        }
 
         return response()->json($response, 200);
     }

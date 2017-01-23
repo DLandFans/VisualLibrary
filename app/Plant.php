@@ -45,9 +45,17 @@ class Plant extends Model
         return $this->hasMany('App\PlantNote', 'plant_id');
     }
 
+    public function botanicalNames() {
+        return $this->hasMany('App\BotanicalName', 'plant_id');
+    }
+
+    public function commonNames() {
+        return $this->hasMany('App\CommonName', 'plant_id');
+    }
+
     // Functions
 
-    public static function botanicalName(Plant $plant)
+    public static function botanicalName($plant)
     {
         if (INFX::IsNullOrEmptyString($plant->genus_name)  && INFX::IsNullOrEmptyString($plant->specific_epithet))
         {
@@ -89,7 +97,7 @@ class Plant extends Model
         return $plantname;
     }
 
-    public static function leafDrop(Plant $plant)
+    public static function leafDrop($plant)
     {
         $bw = $plant->leaf_drop_bw;
         $returnVal = null;
@@ -111,7 +119,7 @@ class Plant extends Model
         return $returnVal;
     }
 
-    public static function sunExposure(Plant $plant)
+    public static function sunExposure($plant)
     {
         $bw = $plant->sun_exposure;
         $returnVal = "";
@@ -119,6 +127,9 @@ class Plant extends Model
         if (INFX::IsNullOrEmptyString($bw) || $bw == 0) return $returnVal;
 
         $base = 0;
+        $spos = null;
+        $epos = null;
+
         while ($base < 5)
         {
             if ($bw&pow(2,$base))
@@ -156,12 +167,12 @@ class Plant extends Model
         return $returnList;
     }
 
-    public static function height(Plant $plant)
+    public static function height($plant)
     {
         return self::spreadSize($plant->height_min, $plant->height_max) . " Height";
     }
 
-    public static function width(Plant $plant)
+    public static function width($plant)
     {
         return self::spreadSize($plant->width_min, $plant->width_max) . " Width";
     }
@@ -177,7 +188,7 @@ class Plant extends Model
             return INFX::toFeetAndInches($min) . " to " . INFX::toFeetAndInches($max);
     }
 
-    public static function zone(Plant $plant)
+    public static function zone($plant)
     {
         $low = $plant->zone_low;
         $high = $plant->zone_high;
@@ -189,7 +200,7 @@ class Plant extends Model
         return $low . " through " . $high;
     }
 
-    public static function hardiness(Plant $plant)
+    public static function hardiness($plant)
     {
         $low = $plant->hardiness_low;
         $high = $plant->hardiness_high;
@@ -200,14 +211,95 @@ class Plant extends Model
         return $low . "° to " . $high . "°";
     }
 
-    public static function bloomMonths(Plant $plant)
+    public static function bloomMonths($plant)
     {
         return INFX::makeList(INFX::months(), $plant->bloom_months_bw);
     }
 
-    public static function bloomMonthsList(Plant $plant)
+    public static function bloomMonthsList($plant)
     {
         return INFX::buildList(self::bloomMonths($plant), "and");
+    }
+
+    public static function altBotanicalNames($plants)
+    {
+        $returnPlants = [];
+        foreach ($plants as $plant)
+        {
+            array_push($returnPlants, self::botanicalName($plant));
+        }
+        return $returnPlants;
+    }
+
+    public static function altBotanicalNamesList($plant)
+    {
+        $list = INFX::buildList(self::altBotanicalNames($plant), "and");
+        if(INFX::IsNullOrEmptyString($list)) return null;
+        return $list;
+    }
+
+    public static function altCommonNames($plants)
+    {
+        $returnPlants = [];
+        foreach ($plants as $plant)
+        {
+            array_push($returnPlants, $plant->common_name);
+        }
+        return $returnPlants;
+    }
+
+    public static function altCommonNamesList($plant)
+    {
+        $list = INFX::buildList(self::altCommonNames($plant), "and");
+        if(INFX::IsNullOrEmptyString($list)) return null;
+        return $list;
+    }
+
+    public static function specificationsList($plants)
+    {
+        $specs = [];
+        foreach($plants as $plant)
+        {
+            $singleSpec = [];
+            $singleSpec['id'] = $plant->specification_id;
+            $singleSpec['specification'] = $plant->specification;
+            $singleSpec['icon'] = $plant->icon_file_name . "." . $plant->icon_file_type;
+
+            if (!INFX::IsNullOrEmptyString($plant->pivot->specification_note))
+            {
+                $singleSpec['note'] = $plant->pivot->specification_note;
+            }
+
+            array_push($specs, $singleSpec);
+        }
+        return $specs;
+    }
+
+    public static function images($plants)
+    {
+        $images = [];
+        foreach($plants as $plant)
+        {
+            $singleImg = [];
+            $singleImg['image'] = $plant->file_name . "." . $plant->file_type;
+            if (!INFX::IsNullOrEmptyString($plant->image_desc))
+            {
+                $singleImg['description'] = $plant->image_desc;
+            }
+            array_push($images, $singleImg);
+        }
+        return $images;
+    }
+
+    public static function notes($plants)
+    {
+        $notes = [];
+
+        foreach ($plants as $plant)
+        {
+            array_push($notes, $plant->note);
+        }
+        return $notes;
     }
 
 }
