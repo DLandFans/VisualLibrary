@@ -263,7 +263,7 @@ class Plant extends Model
             $singleSpec = [];
             $singleSpec['id'] = $plant->specification_id;
             $singleSpec['specification'] = $plant->specification;
-            $singleSpec['icon'] = $plant->icon_file_name . "." . $plant->icon_file_type;
+            $singleSpec['icon'] = INFX::imagesDir() ."/resources/" . $plant->icon_file_name . "." . $plant->icon_file_type;
 
             if (!INFX::IsNullOrEmptyString($plant->pivot->specification_note))
             {
@@ -281,7 +281,7 @@ class Plant extends Model
         foreach($plants as $plant)
         {
             $singleImg = [];
-            $singleImg['image'] = $plant->file_name . "." . $plant->file_type;
+            $singleImg['image'] = INFX::imagesDir() ."/plants/" . $plant->file_name . "." . $plant->file_type;
             if (!INFX::IsNullOrEmptyString($plant->image_desc))
             {
                 $singleImg['description'] = $plant->image_desc;

@@ -15,16 +15,15 @@ class LVLController extends Controller
      */
     public function index(Request $request)
     {
-
         $response = [ 'msg' => 'Plant List'];
 
         if (!INFX::IsNullOrEmptyString($request->input('all')) && (strtolower($request->input('all')) != "false")) {
-            $plants = Plant::all();
+            $plants = Plant::orderBy('genus_name','asc')->orderBy('specific_epithet')->get(); //all();
         } else {
             $perPage = INFX::perPage();
             if(!INFX::IsNullOrEmptyString($request->input('per_page'))) $perPage = $request->input('per_page');
 
-            $plants = Plant::paginate($perPage);
+            $plants = Plant::orderBy('genus_name','asc')->orderBy('specific_epithet')->paginate($perPage);
 
             $next_page = $plants->nextPageUrl();
             $prev_page = $plants->previousPageUrl();
@@ -54,7 +53,7 @@ class LVLController extends Controller
                 'botanical_name' => Plant::botanicalName($plant),
                 'common_name' => $plant->common_name,
                 'view_plant' => [
-                    'href' => url('/api/v1/lvl') . '/' . $plant->plant_id,
+                    'href' => url(INFX::v1()) . '/' . $plant->plant_id,
                     'method' => 'GET'
                 ]
             ];
@@ -92,9 +91,9 @@ class LVLController extends Controller
 
         $plant['id'] = $plantDetails->plant_id;
         $plant['botanical_name'] = Plant::botanicalName($plantDetails);
-        $plant['altername_botanical_name_list'] = Plant::altBotanicalNamesList($plantDetails->botanicalNames);
+        $plant['alternate_botanical_name_list'] = Plant::altBotanicalNamesList($plantDetails->botanicalNames);
         $plant['common_name'] = $plantDetails->common_name;
-        $plant['altername_common_name_list'] = Plant::altCommonNamesList($plantDetails->commonNames);
+        $plant['alternate_common_name_list'] = Plant::altCommonNamesList($plantDetails->commonNames);
         $plant['type'] = Plant::leafDrop($plantDetails) . " " . Plant::plantClass($plantDetails->classifications);
         $plant['height'] = Plant::height($plantDetails);
         $plant['width'] = Plant::width($plantDetails);
@@ -110,9 +109,9 @@ class LVLController extends Controller
 
         $response = [
             'msg' => 'Plant Information',
-            'plant' => $plant,
+            'info' => $plant,
             'view_plants' => [
-                'href' => url('/api/v1/lvl'),
+                'href' => url(INFX::v1()),
                 'method' => 'GET'
             ]
         ];
@@ -121,7 +120,7 @@ class LVLController extends Controller
             $response['plant_details'] = $plantDetails;
         } else {
             $response['view_plant_details'] = [
-                'href' => url('/api/v1/lvl') . "/" . $plantDetails->plant_id . "?detail=true",
+                'href' => url(INFX::v1()) . "/" . $plantDetails->plant_id . "?detail=true",
                 'method' => 'GET'
             ];
         }

@@ -4,10 +4,17 @@ namespace App;
 
 class INFX
 {
+    private static $v1 = '/vislib/v1';
+
+//    private static $images_dir = 'http://images.landscapeit.com';  //Production Version
+    private static $images_dir = 'http://images.landscapeit.dev';  //Change for Production
+
     private static $per_page = 10;
     private static $months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     private static $sun = ['Reflected Sun', 'Full Sun', 'Partial Sun', 'Partial Shade', 'Full Shade'];
 
+    public static function v1() {return self::$v1; }
+    public static function imagesDir() {return self::$images_dir; }
     public static function perPage() { return self::$per_page; }
     public static function months() { return self::$months; }
     public static function sun() { return self::$sun; }

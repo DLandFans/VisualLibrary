@@ -19,8 +19,12 @@ use Illuminate\Http\Request;
 
 Route::group(['prefix' => 'v1'], function() {
 
-    Route::resource('lvl','LVLController', [
-            'only' => ['index', 'show']
-        ]);
+//    Route::resource('/','LVLController', [
+//            'only' => ['index', 'show']
+//        ]);
+
+    Route::get('/', 'LVLController@index');
+    Route::get('/{id}', 'LVLController@show')->where(['id' => '[0-9]+']);
 
 });
+

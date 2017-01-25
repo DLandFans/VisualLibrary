@@ -16,5 +16,5 @@
 //});
 
 Route::get('/', function () {
-    return "Under Development";
+    return "Landscape IT API Documentation Under Development";
 });
