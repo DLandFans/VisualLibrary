@@ -74,6 +74,7 @@ class LVLController extends Controller
      */
     public function show($id, Request $request)
     {
+
         $plantDetails = Plant::with('botanicalNames')
                             ->with('commonNames')
                             ->with('classifications')
@@ -125,7 +126,8 @@ class LVLController extends Controller
             ];
         }
 
-        return response()->json($response, 200);
+        return response()
+            ->json($response, 200);
     }
 
 }
